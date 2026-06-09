@@ -1,0 +1,21 @@
+[package]
+name = "demo_vault"
+version = "0.1.0"
+description = "Demo vault program protected by Aegis"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "demo_vault"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "aegis_guard/idl-build"]
+
+[dependencies]
+aegis_guard = { path = "../aegis_guard", features = ["cpi"] }
+anchor-lang = "0.32.1"

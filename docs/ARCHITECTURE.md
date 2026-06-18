@@ -36,10 +36,10 @@ The MVP implements the inline guard layer only.
 
 Implemented programs:
 
-| Program | Status | Purpose |
-| --- | --- | --- |
+| Program       | Status      | Purpose                                                                                              |
+| ------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
 | `aegis_guard` | Implemented | Stores guard config/state, records snapshots, evaluates vault outflow, and trips on threshold breach |
-| `demo_vault` | Implemented | Minimal demo protocol with an internal `u64` balance |
+| `demo_vault`  | Implemented | Minimal demo protocol with an internal `u64` balance                                                 |
 
 Not currently implemented:
 
@@ -109,13 +109,13 @@ in `state.rs`, and custom Anchor errors live in `errors.rs`.
 
 Public instructions:
 
-| Instruction | Purpose |
-| --- | --- |
-| `initialize_config` | Creates the guard config PDA and state PDA |
-| `snapshot` | Stores pre-action vault balance metadata |
-| `evaluate` | Compares post-action balance against the snapshot and threshold |
-| `update_config` | Lets the authority update thresholds, pause state, and simulation mode |
-| `reset` | Clears trip state |
+| Instruction         | Purpose                                                                |
+| ------------------- | ---------------------------------------------------------------------- |
+| `initialize_config` | Creates the guard config PDA and state PDA                             |
+| `snapshot`          | Stores pre-action vault balance metadata                               |
+| `evaluate`          | Compares post-action balance against the snapshot and threshold        |
+| `update_config`     | Lets the authority update thresholds, pause state, and simulation mode |
+| `reset`             | Clears trip state                                                      |
 
 Current files:
 
@@ -137,11 +137,11 @@ programs/aegis_guard/src
 
 Public instructions:
 
-| Instruction | Purpose |
-| --- | --- |
-| `initialize` | Creates the demo vault PDA |
-| `deposit` | Adds to the vault's internal balance |
-| `withdraw` | Subtracts from the vault's internal balance after an available-balance check |
+| Instruction  | Purpose                                                                      |
+| ------------ | ---------------------------------------------------------------------------- |
+| `initialize` | Creates the demo vault PDA                                                   |
+| `deposit`    | Adds to the vault's internal balance                                         |
+| `withdraw`   | Subtracts from the vault's internal balance after an available-balance check |
 
 Current files:
 
@@ -166,15 +166,15 @@ Owned by `aegis_guard`.
 
 Stores:
 
-| Field | Meaning |
-| --- | --- |
-| `authority` | Governance/admin authority for this config |
+| Field                     | Meaning                                                           |
+| ------------------------- | ----------------------------------------------------------------- |
+| `authority`               | Governance/admin authority for this config                        |
 | `velocity_multiplier_bps` | Stored for future velocity checks; not used in current evaluation |
-| `max_outflow_bps` | Maximum allowed outflow in basis points |
-| `cooldown_slots` | Stored for future cooldown enforcement |
-| `is_simulation_mode` | If true, excessive outflow records trip metadata without aborting |
-| `is_paused` | If true, snapshot/evaluate-style guard actions fail |
-| `bump` | PDA bump |
+| `max_outflow_bps`         | Maximum allowed outflow in basis points                           |
+| `cooldown_slots`          | Stored for future cooldown enforcement                            |
+| `is_simulation_mode`      | If true, excessive outflow records trip metadata without aborting |
+| `is_paused`               | If true, snapshot/evaluate-style guard actions fail               |
+| `bump`                    | PDA bump                                                          |
 
 ### `CircuitBreakerState`
 
@@ -182,14 +182,14 @@ Owned by `aegis_guard`.
 
 Stores:
 
-| Field | Meaning |
-| --- | --- |
-| `is_tripped` | Whether the guard has recorded a trip |
-| `tripped_at_slot` | Slot when the trip was recorded |
-| `trip_reason` | Current trip reason enum |
-| `delta_value_at_trip` | Outflow observed at trip time |
-| `threshold_at_trip` | Threshold used at trip time |
-| `bump` | PDA bump |
+| Field                 | Meaning                               |
+| --------------------- | ------------------------------------- |
+| `is_tripped`          | Whether the guard has recorded a trip |
+| `tripped_at_slot`     | Slot when the trip was recorded       |
+| `trip_reason`         | Current trip reason enum              |
+| `delta_value_at_trip` | Outflow observed at trip time         |
+| `threshold_at_trip`   | Threshold used at trip time           |
+| `bump`                | PDA bump                              |
 
 Current trip reasons:
 
@@ -204,14 +204,14 @@ Owned by `aegis_guard`.
 
 Stores:
 
-| Field | Meaning |
-| --- | --- |
-| `config` | Config PDA this snapshot belongs to |
-| `protocol` | Protocol signer recorded for this snapshot |
-| `vault` | Vault account key recorded for this snapshot |
-| `pre_vault_balance` | Balance before the protected action |
-| `snapshot_slot` | Slot when the snapshot was created |
-| `bump` | PDA bump |
+| Field               | Meaning                                      |
+| ------------------- | -------------------------------------------- |
+| `config`            | Config PDA this snapshot belongs to          |
+| `protocol`          | Protocol signer recorded for this snapshot   |
+| `vault`             | Vault account key recorded for this snapshot |
+| `pre_vault_balance` | Balance before the protected action          |
+| `snapshot_slot`     | Slot when the snapshot was created           |
+| `bump`              | PDA bump                                     |
 
 ### `DemoVault`
 
@@ -219,11 +219,11 @@ Owned by `demo_vault`.
 
 Stores:
 
-| Field | Meaning |
-| --- | --- |
+| Field       | Meaning                                    |
+| ----------- | ------------------------------------------ |
 | `authority` | Authority allowed to mutate the demo vault |
-| `balance` | Internal demo balance, stored as `u64` |
-| `bump` | PDA bump |
+| `balance`   | Internal demo balance, stored as `u64`     |
+| `bump`      | PDA bump                                   |
 
 `DemoVault` is not a token account. It is a simple program account used to
 exercise protocol-like balance changes during MVP development.
@@ -447,14 +447,14 @@ flowchart TB
 
 The target architecture may add these accounts:
 
-| Account | Owner | Purpose |
-| --- | --- | --- |
-| `OutflowHistory` | Guard or Hook | Tracks historical token outflow baselines |
-| `PriceHistory` | Guard | Stores EMA or price samples for price anomaly checks |
-| `ExtraAccountMeta` | Hook | Registers extra accounts required by Token-2022 transfer hooks |
-| Token vault account | Token program | Stores real protected assets |
-| User token account | Token program | Stores user-owned tokens |
-| Token-2022 mint | Token-2022 program | Mint configured with transfer hook extension |
+| Account             | Owner              | Purpose                                                        |
+| ------------------- | ------------------ | -------------------------------------------------------------- |
+| `OutflowHistory`    | Guard or Hook      | Tracks historical token outflow baselines                      |
+| `PriceHistory`      | Guard              | Stores EMA or price samples for price anomaly checks           |
+| `ExtraAccountMeta`  | Hook               | Registers extra accounts required by Token-2022 transfer hooks |
+| Token vault account | Token program      | Stores real protected assets                                   |
+| User token account  | Token program      | Stores user-owned tokens                                       |
+| Token-2022 mint     | Token-2022 program | Mint configured with transfer hook extension                   |
 
 Target PDA seeds should remain deterministic and scoped to the protected
 protocol, mint, vault, or market so different deployments do not share risk
@@ -462,17 +462,17 @@ state accidentally.
 
 ## 10. Target Interaction Matrix
 
-| Source | Target | Interaction Type | Purpose |
-| --- | --- | --- | --- |
-| User | Protocol Program | Transaction instruction | User-facing DeFi operation |
-| Protocol Program | Aegis Guard Program | CPI | Capture pre-action state |
-| Protocol Program | Token-2022 Program | CPI | Move protected assets |
-| Token-2022 Program | Aegis Transfer Hook Program | Hook callback | Validate transfer before completion |
-| Protocol Program | Aegis Guard Program | CPI | Evaluate post-action state |
-| Aegis Guard Program | Pyth Oracle / PriceHistory | Account read | Detect abnormal price movement |
-| Aegis Guard Program | OutflowHistory | Account read | Detect abnormal outflow velocity |
-| Governance Multisig | Aegis Guard Program | Admin instruction | Tune thresholds and recover from trips |
-| Off-Chain Monitor | Governance Multisig | Report | Support threshold calibration |
+| Source              | Target                      | Interaction Type        | Purpose                                |
+| ------------------- | --------------------------- | ----------------------- | -------------------------------------- |
+| User                | Protocol Program            | Transaction instruction | User-facing DeFi operation             |
+| Protocol Program    | Aegis Guard Program         | CPI                     | Capture pre-action state               |
+| Protocol Program    | Token-2022 Program          | CPI                     | Move protected assets                  |
+| Token-2022 Program  | Aegis Transfer Hook Program | Hook callback           | Validate transfer before completion    |
+| Protocol Program    | Aegis Guard Program         | CPI                     | Evaluate post-action state             |
+| Aegis Guard Program | Pyth Oracle / PriceHistory  | Account read            | Detect abnormal price movement         |
+| Aegis Guard Program | OutflowHistory              | Account read            | Detect abnormal outflow velocity       |
+| Governance Multisig | Aegis Guard Program         | Admin instruction       | Tune thresholds and recover from trips |
+| Off-Chain Monitor   | Governance Multisig         | Report                  | Support threshold calibration          |
 
 ## 11. Target Withdrawal Flow
 
@@ -596,7 +596,7 @@ Target architecture assumptions:
 Recommended implementation order:
 
 1. Add an end-to-end Anchor test for `snapshot -> demo_vault withdraw ->
-   evaluate`.
+evaluate`.
 2. Enforce `CircuitBreakerState.is_tripped` in guarded paths.
 3. Enforce `cooldown_slots` in `reset`.
 4. Emit structured Anchor events for trips and simulation-mode violations.

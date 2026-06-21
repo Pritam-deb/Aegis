@@ -12,22 +12,26 @@ If the protected action causes a vault outflow above the configured threshold, t
 
 ## Current Status
 
-This repository currently implements the MVP inline guard layer.
+The MVP inline guard layer is implemented, deployed to Solana devnet, and
+covered by a 10-test integration suite that passes against devnet.
 
 Implemented:
 
 - Anchor workspace with two programs: `aegis_guard` and `demo_vault`
+- Both programs deployed and executable on Solana devnet
 - Guard config, trip state, and snapshot accounts
 - Threshold-based outflow evaluation
 - Simulation mode support
 - Authority-controlled config updates
-- Basic reset instruction
+- Authority-controlled trip-state reset
+- Atomic rollback of protected actions when live evaluation trips
+- Validation for invalid thresholds, paused guards, account mismatches,
+  insufficient balances, and arithmetic overflow
 - Modular Rust program layout by instruction, state, and errors
-- Basic TypeScript smoke test for program initialization
+- TypeScript integration suite covering the complete MVP guard flow
 
-Not implemented yet:
+Possible future enhancements:
 
-- A full end-to-end test for `snapshot -> protected action -> evaluate`
 - CPI integration from `demo_vault` into `aegis_guard`
 - SPL Token or Token-2022 vault accounting
 - Token-2022 transfer hooks
@@ -41,7 +45,7 @@ in `docs/mvp_scope.md`.
 
 ## Programs
 
-These program IDs are configured for both localnet and devnet:
+These programs are deployed on Solana devnet:
 
 ```text
 aegis_guard: Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN
@@ -53,10 +57,10 @@ demo_vault:  4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy
 | `aegis_guard` | `Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN` | Reusable circuit-breaker guard                 |
 | `demo_vault`  | `4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy` | Minimal demo protocol with an internal balance |
 
-After devnet deployment, the programs can be viewed at:
+View the deployed programs in Solana Explorer:
 
-- `aegis_guard`: `https://explorer.solana.com/address/Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN?cluster=devnet`
-- `demo_vault`: `https://explorer.solana.com/address/4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy?cluster=devnet`
+- [`aegis_guard` on devnet](https://explorer.solana.com/address/Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN?cluster=devnet)
+- [`demo_vault` on devnet](https://explorer.solana.com/address/4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy?cluster=devnet)
 
 ## Devnet Test Results
 
@@ -101,6 +105,8 @@ The complete integration test suite passes against Solana devnet: **10 passing t
 │   └── aegis.ts
 └── docs
     ├── ARCHITECTURE.md
+    ├── assets
+    │   └── devnet-tests-passing.png
     └── mvp_scope.md
 ```
 
@@ -238,7 +244,7 @@ Type-check the TypeScript test/client code:
 NO_DNA=1 yarn tsc --noEmit
 ```
 
-Run the full Anchor test suite:
+Run the full test suite on a local validator:
 
 ```bash
 NO_DNA=1 anchor test
@@ -247,6 +253,21 @@ NO_DNA=1 anchor test
 If port `8899` is already occupied by another local validator, stop that
 validator or run against a separate local validator configuration before
 retrying.
+
+Run the deployed programs' integration suite against Solana devnet:
+
+```bash
+ANCHOR_PROVIDER_URL=https://api.devnet.solana.com \
+ANCHOR_WALLET="$HOME/.config/solana/id.json" \
+NO_DNA=1 \
+yarn run ts-mocha \
+  -p ./tsconfig.json \
+  -t 1000000 \
+  tests/**/*.ts
+```
+
+The devnet run creates test accounts and submits transactions, so the configured
+wallet must contain enough devnet SOL to pay transaction fees and account rent.
 
 ## Development Notes
 
@@ -263,20 +284,8 @@ large single-file program implementation.
 
 ## Next Milestones
 
-The most important next step is proving the full atomic guard behavior with an
-end-to-end test:
-
-```text
-initialize guard
-initialize demo vault
-deposit into demo vault
-snapshot pre-action balance
-withdraw beyond threshold
-evaluate post-action balance
-assert the transaction fails when simulation mode is false
-```
-
-After that, the project can move toward real protocol integration:
+The MVP and its atomic rollback behavior are complete. Future development can
+move toward production protocol integration:
 
 - enforce cooldown in `reset`
 - block guarded actions while tripped

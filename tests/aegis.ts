@@ -12,6 +12,7 @@ describe("aegis", () => {
   const aegisGuard = anchor.workspace.AegisGuard as Program<AegisGuard>;
   const demoVault = anchor.workspace.DemoVault as Program<DemoVault>;
   const systemProgram = anchor.web3.SystemProgram.programId;
+  const testAuthorityFundingLamports = 50_000_000;
 
   const bn = (value: number | string) => new anchor.BN(value);
 
@@ -50,15 +51,14 @@ describe("aegis", () => {
 
   const fundAuthority = async () => {
     const authority = anchor.web3.Keypair.generate();
-    const latestBlockhash = await provider.connection.getLatestBlockhash();
-    const signature = await provider.connection.requestAirdrop(
-      authority.publicKey,
-      5 * anchor.web3.LAMPORTS_PER_SOL,
-    );
-
-    await provider.connection.confirmTransaction(
-      { signature, ...latestBlockhash },
-      "confirmed",
+    await provider.sendAndConfirm(
+      new anchor.web3.Transaction().add(
+        anchor.web3.SystemProgram.transfer({
+          fromPubkey: provider.wallet.publicKey,
+          toPubkey: authority.publicKey,
+          lamports: testAuthorityFundingLamports,
+        }),
+      ),
     );
 
     return authority;
@@ -380,16 +380,28 @@ describe("aegis", () => {
       })
       .instruction();
 
-    await expectFailure(
-      provider.sendAndConfirm(
-        new anchor.web3.Transaction()
-          .add(snapshotIx)
-          .add(withdrawIx)
-          .add(evaluateIx),
-        [authority],
-      ),
-      "CircuitBreakerTripped",
+    const transaction = new anchor.web3.Transaction()
+      .add(snapshotIx)
+      .add(withdrawIx)
+      .add(evaluateIx);
+    const latestBlockhash = await provider.connection.getLatestBlockhash();
+
+    transaction.feePayer = authority.publicKey;
+    transaction.recentBlockhash = latestBlockhash.blockhash;
+    transaction.sign(authority);
+
+    const signature = await provider.connection.sendRawTransaction(
+      transaction.serialize(),
+      { skipPreflight: true },
     );
+    const confirmation = await provider.connection.confirmTransaction(
+      { signature, ...latestBlockhash },
+      "confirmed",
+    );
+
+    assert.deepStrictEqual(confirmation.value.err, {
+      InstructionError: [2, { Custom: 6003 }],
+    });
 
     const vaultAccount = await demoVault.account.demoVault.fetch(vault);
     assert.strictEqual(vaultAccount.balance.toNumber(), 1_000);

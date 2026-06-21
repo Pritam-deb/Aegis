@@ -6,6 +6,10 @@ skip-lint = false
 aegis_guard = "Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN"
 demo_vault = "4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy"
 
+[programs.devnet]
+aegis_guard = "Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN"
+demo_vault = "4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy"
+
 [registry]
 url = "https://api.apr.dev"
 

@@ -41,10 +41,28 @@ in `docs/mvp_scope.md`.
 
 ## Programs
 
-| Program       | Localnet Program ID                            | Purpose                                        |
+These program IDs are configured for both localnet and devnet:
+
+```text
+aegis_guard: Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN
+demo_vault:  4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy
+```
+
+| Program       | Program ID                                     | Purpose                                        |
 | ------------- | ---------------------------------------------- | ---------------------------------------------- |
 | `aegis_guard` | `Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN` | Reusable circuit-breaker guard                 |
 | `demo_vault`  | `4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy` | Minimal demo protocol with an internal balance |
+
+After devnet deployment, the programs can be viewed at:
+
+- `aegis_guard`: `https://explorer.solana.com/address/Bzt5J5Vw7KHQPp9ZEu9yuPf6GcVaMbMrrUk6m8GkpPSN?cluster=devnet`
+- `demo_vault`: `https://explorer.solana.com/address/4gTAfDeL3ketKCwZUCRfFjBJMagxUUxpjgEu7KssUsNy?cluster=devnet`
+
+## Devnet Test Results
+
+The complete integration test suite passes against Solana devnet: **10 passing tests**.
+
+![Aegis integration tests passing on Solana devnet](docs/assets/devnet-tests-passing.png)
 
 ## Repository Layout
 
